@@ -1,0 +1,24 @@
+map <string, string> old_map_alg;
+
+string line,name,map_name;
+    stringstream in_out;
+    ifstream omp_alg("old_map_file.analog");
+    if (!omp_alg)
+    {
+        cout<<"open file old_map_file.analog failed"<<endl;
+        return -1;
+    }
+
+    while (getline(omp_alg,line))
+    {
+        in_out.clear();
+        name.clear();
+        map_name.clear();
+        in_out << line;
+        in_out >> name >> map_name;
+//      cout << name << " " << map_name;
+
+        old_map_alg.insert(make_pair(name,map_name));
+//      map<string,string>::iterator it = old_map_alg.find(name);
+//      cout <<"  finally  "<< it->first << " " << it->second << endl;
+    }

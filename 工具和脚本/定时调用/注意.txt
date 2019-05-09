@@ -1,0 +1,9 @@
+void settimer(int s)中，cmd是制定定时调用的程序。
+
+
+参数：./程序   每隔多少秒n   多少分钟后开始m    0
+
+（如果m=0是表示从 下一分0秒开始调用，且每过n秒调用指定功能， 如果m(>0)，则m分钟后开始，当前到下一分0秒不足一分的，算一分钟）。
+
+编译注意：
+linux环境下，编译选项中需要添加-lrt  否则，timer_delete   timer_create  timer_settime 编译是会提示未声明。

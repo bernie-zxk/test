@@ -1,0 +1,40 @@
+例：
+
+---------------------------------
+
+
+set timeout 300
+spawn /home/d5000/huazhong/bin/sys_ctl stop
+expect "应用data_srv,态:1仅存在于本机上！是否继续停止？n-退出,y-继续,all-全部继续"
+send "all\r"
+expect eof
+
+---------------------------------
+
+
+
+前提，需要安装  expect  
+
+#!/usr/bin/expect -f
+spawn  scp -rp xxx.txt 10.10.10.11:tmp/
+expect "passwd:"
+send   "d5000\r"
+expect eof  
+
+------------------------------------
+
+注意：
+spawn 会创建一个子进程，子进程的超时时间默认是10秒，超过后，子进程会结束。
+对于上面的例子，如果scp -rp的文件过多或过大，超过10秒，就会导致文件传输不完。
+解决：
+修改超时时间：set timeout 300
+改为
+
+#!/usr/bin/expect -f
+spawn  scp -rp xxx.txt 10.10.10.11:tmp/
+expect "passwd:"
+send   "d5000\r"
+
+set timeout 300
+
+expect eof  

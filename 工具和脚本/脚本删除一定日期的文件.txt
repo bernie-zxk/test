@@ -1,0 +1,10 @@
+#!/bin/sh
+CUR_DATE=`date +%Y-%m-%d`
+echo "$CUR_DATE"
+PAST_DATE=$(date --date='3 days ago' +%Y-%m-%d)
+echo "$PAST_DATE"
+
+LOG_PATH=$HOME/adm/combob/log
+LOG_FILE=$PAST_DATE"_*.log"
+echo "rm -rf $LOG_PATH/$PAST_DATE_*.log"
+echo "rm -rf $LOG_PATH/$LOG_FILE"

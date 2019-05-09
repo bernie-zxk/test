@@ -1,0 +1,275 @@
+#include <create_sql_insert.h>
+
+
+
+/************************************************************
+**FUNCTION:
+**	DCI_SQL_TOOL()
+************************************************************/
+DCI_SQL_TOOL::DCI_SQL_TOOL()
+{
+}
+
+/************************************************************
+**FUNCTION:
+**	~OCI_TOOLS()
+************************************************************/
+DCI_SQL_TOOL::~DCI_SQL_TOOL()
+{
+}
+
+bool DCI_SQL_TOOL::dbconnect(char *srv_name,char *user_name,char *password)
+{
+#if 1
+      char *szFunction="dbconnect"; 
+
+
+    ErrorInfo_t error;
+    bool bb=cdv1.Connect(srv_name,user_name,password, &error);
+    if(!bb)
+	{
+		printf("Error:%s      file  %s,  line  %d\n",error.error_info,__FILE__,__LINE__);
+		return DCI_SQL_FAIL;
+	}
+
+	return DCI_SQL_SUCCEED;
+}
+
+
+bool DCI_SQL_TOOL::dbdisconnect()
+{
+    char *szFunction="dbdisconnect";			//执行函数名
+    int ret;
+
+
+	 ErrorInfo_t error;
+        bool bb=cdv1.DisConnect(&error);
+         if(!bb)
+	  {
+	     printf("Error:%s      file  %s,  line  %d\n",error.error_info,__FILE__,__LINE__);
+		 return DCI_SQL_FAIL;
+	  }
+
+	 return DCI_SQL_SUCCEED;
+	
+}
+
+
+
+int DCI_SQL_TOOL::create_insert(char * tbname, char* outputfile)
+{
+
+       ColAttr *attrs;
+	ErrorInfo_t error;
+	int rec_num;
+	int attr_num;
+	char       *buf=NULL;
+	char       *tmp;
+
+	ofstream osqlf;
+	osqlf.open(outputfile);
+	if(!osqlf)
+	{
+		cout<<"无法创建文件   "<<outputfile<<endl;
+		return -1;
+	}
+	osqlf<<"--   table  "<<tbname<<"     begin"<<endl;
+	
+
+	string cmdbuf("select * from  ");
+	cmdbuf += tbname;
+
+	
+	int ret=cdv1.ReadData(cmdbuf.c_str(),-1, &rec_num, &attr_num,&attrs,&buf,&error);
+	if(!ret)
+	{
+	//	printf("Error:error_no: %d, error_info: %s  sql: %s\n",error.error_no,error.error_info,cmdbuf);
+		cout<<"Error:error_no: "<<error.error_no<<", error_info: "<<error.error_info<<"   sql: "<<cmdbuf<<endl;
+		return DCI_SQL_FAIL;
+	}
+
+	
+	int count=0;
+	int j;
+	int i;
+	vector<FIELD_S>  v_fields;
+	FIELD_S  tmpfields;
+	char* tmpaddr=NULL;
+
+	unsigned  long ll_tmp;
+	int        li_tmp;
+	short      ls_tmp;
+    	unsigned  char lc_tmp;
+   	float      fl_tmp;
+	double     dl_tmp;
+
+	int tmp_len=0;
+	stringstream head_stream;
+	stringstream field_stream;
+	stringstream value_stream;
+	string midsql;
+
+       string    onesql;
+	vector<string>  v_sqls;
+	
+	
+	for(i=0;i<rec_num;i++)
+	{
+//	    bind_address = new _list_bind;
+              v_fields.clear();     //清空缓存 
+		count++;
+		for(j=0;j<attr_num;j++)
+		{
+		   if(attrs[j].data_size > MAX_VALUE_LEN)
+		   {
+			   	cout<<"实际字段值长度过长 ，MAX_VALUE_LEN设置不足。  filed :   "<<attrs[j].col_name<<endl;	
+				return -1;
+		   }
+		    if(strlen(attrs[j].col_name) > MAX_FIELD_LEN)
+		   {
+			   	cout<<"实际字段名长度过长 ，MAX_FIELD_LEN设置不足。  filed :   "<<attrs[j].col_name<<endl;	
+				return -1;
+		   }
+			
+		   tmp=buf+tmp_len;
+
+		   //memset((void *)tmpfields,0,sizeof(tmpfields));
+		   bzero(tmpfields.field_name,sizeof(tmpfields.field_name));
+		   bzero(tmpfields.field_value,sizeof(tmpfields.field_value));
+		   tmpfields.ifok=false;
+		  
+		   //字段名  存入
+#ifdef  _MYSQL_              //与保留字冲突的情况
+
+		   if(strcasecmp(attrs[j].col_name,"describe")==0)
+			   sprintf(tmpfields.field_name,"`describe`\0");
+#else
+		   sprintf(tmpfields.field_name,"%s\0",attrs[j].col_name); 
+#endif
+		   strcpy(tmpfields.field_name,attrs[j].col_name);//字段名  存入
+		   switch(attrs[j].data_type)
+		   {
+			   case DCI_STR:
+			   case DCI_CHR:	
+				char tmpchars[MAX_VALUE_LEN];
+				bzero(tmpchars,sizeof(tmpchars));
+				bcopy(tmp,tmpchars,attrs[j].data_size);       //字段值存入
+				sprintf(tmpfields.field_value,"'%s'\0",tmpchars);
+				tmpfields.ifok=true;
+				break;
+
+			   case DCI_NUM:    
+				   break;
+				   
+			   case DCI_INT:
+                        switch(attrs[j].data_size)
+				   {
+					   case 1:
+					   memcpy(&lc_tmp,tmp,attrs[j].data_size);
+					   sprintf(tmpfields.field_value,"%d\0",lc_tmp);  //字段值存入
+					   tmpfields.ifok=true;
+				          break;
+						 
+					   case 2:
+					   memcpy(&ls_tmp,tmp,attrs[j].data_size);
+					   sprintf(tmpfields.field_value,"%d\0",ls_tmp);		
+					   tmpfields.ifok=true;
+				          break;
+							
+					   case 4:
+					   memcpy(&li_tmp,tmp,attrs[j].data_size);
+					   sprintf(tmpfields.field_value,"%d\0",li_tmp);
+					   tmpfields.ifok=true;
+					   break;
+						   
+					   case 8:
+					   memcpy(&ll_tmp,tmp,attrs[j].data_size);
+					   sprintf(tmpfields.field_value,"%ld\0",ll_tmp);
+					   tmpfields.ifok=true;
+					   break;
+						   
+					   default:
+						   printf("Error:数据类型错误：字段名 %s,  类型%d，长度=%d,  file  %s,   line  %d\n",attrs[j].col_name,attrs[j].data_type,attrs[j].data_size,__FILE__,__LINE__);
+						   break;
+
+				   }
+				   break;
+			   case DCI_FLT:
+                                switch(attrs[j].data_size)
+				    {
+						case 4:
+							memcpy(&fl_tmp,tmp,attrs[j].data_size);
+							 char tmp_tt[100];
+				                     sprintf(tmp_tt,"%.4f\0",fl_tmp);
+				                    if(strlen(tmp_tt) > 15) 
+				                    {
+					                 printf("Warning:%.4f 超长\n",fl_tmp);
+							   tmpfields.ifok=false;
+					                  break;
+				                     }
+							sprintf(tmpfields.field_value,"%.4f\0",fl_tmp);
+							tmpfields.ifok=true;
+							break;
+						case 8:
+							memcpy(&dl_tmp,tmp,attrs[j].data_size);
+							sprintf(tmpfields.field_value,"%.4f\0",dl_tmp);
+							tmpfields.ifok=true;
+							break;
+						default:
+							break;
+					}
+				       break;
+			   default:
+				   break;
+		   }
+		   tmp_len=tmp_len+attrs[j].data_size;
+		   v_fields.push_back(tmpfields);                      //存储每个字段
+		}//j
+              //每条记录
+              head_stream.str("");
+	       field_stream.str("");
+	       value_stream.str("");
+			  
+		head_stream<<"insert into "<<tbname<<"(";
+		midsql = "  values  (";
+		
+		for(j=0;j<attr_num;j++)
+		{
+		       if(j<attr_num-1)
+		       {
+			      field_stream<<v_fields[j].field_name<<",";
+			      value_stream<<v_fields[j].field_value<<",";
+		       }
+			else
+			{
+			      field_stream<<v_fields[j].field_name<<")";
+			      value_stream<<v_fields[j].field_value<<")";
+			}
+		}
+
+		onesql = head_stream.str() + field_stream.str() + midsql + value_stream.str();
+		cout<<"----debug--onesql:"<<onesql<<endl;
+
+              v_sqls.push_back(onesql);
+		
+	}
+
+	cout<<"----debug--vsql  size:"<<v_sqls.size()<<endl;
+
+	for(i=0;i<v_sqls.size();i++)
+	{
+		osqlf<<v_sqls[i]<<endl;
+	}
+	
+       osqlf<<"--   table  "<<tbname<<"     end"<<endl;
+
+	osqlf.close();
+
+	   
+#endif
+	return 0; //count
+	
+	
+}
+
+

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<BAK_INFO_CONF>
+  <!--通信节点，与对方网调通信节点收发文件-->
+  <COM_SVR name="ccs-net1"/>
+  <!--互备流程程序执行节点 目录-->
+  <LOC_MODEL_SEND_DIR name="/home/d5000/huazhong/data/cimdata"/>
+  <LOC_MEAS_SEND_DIR name="/home/d5000/huazhong/data/cimdata/meas_500kV_send"/>
+  <LOC_FORMULAR_SEND_DIR name="/home/d5000/huazhong/data/cimdata/formular"/>
+  <LOC_MODEL_RECV_DIR name="/home/d5000/huazhong/data/cimdata/bak_info_dir/cime"/>
+  <LOC_MEAS_RECV_DIR name="/home/d5000/huazhong/data/cimdata/bak_info_dir/meas"/>
+  <LOC_FORMULAR_RECV_DIR name="/home/d5000/huazhong/data/cimdata/bak_info_dir/formular"/>
+  <!--通信节点 目录-->
+  <SRV_MODEL_SEND_DIR name="/home/d5000/huazhong/data/bak_info_send/model"/>
+  <SRV_MEAS_SEND_DIR name="/home/d5000/huazhong/data/bak_info_send/meas"/>
+  <SRV_FORMULAR_SEND_DIR name="/home/d5000/huazhong/data/bak_info_send/formular"/>
+  <SRV_MODEL_RECV_DIR name="/home/d5000/huazhong/data/bak_info_recv/model"/>
+  <SRV_MEAS_RECV_DIR name="/home/d5000/huazhong/data/bak_info_recv/meas"/>
+  <SRV_FORMULAR_RECV_DIR name="/home/d5000/huazhong/data/bak_info_recv/formular"/>
+</BAK_INFO_CONF>

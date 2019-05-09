@@ -1,0 +1,4 @@
+g++ mysql_api.cpp -o test -I /home/mysql/include -I /root/include -L /root/lib -L /usr/lib64 -lmysqlclient
+
+
+libmysqlclient.so

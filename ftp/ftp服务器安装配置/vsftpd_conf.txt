@@ -1,0 +1,21 @@
+anonymous_enable=YES          #控制是否匿名登录。如果开启。用户ftp和您们都会作为匿名登录
+local_enable=YES              #控制本地登录是否允许。当设置为YES，正常用户在/etc/passwd()（或者你PAM配置的用户信息）都可以登录。这个可以确保任何非匿名用户可以登录工作，包括虚拟用户。
+write_enable=YES               #这个控制所有FTP命令去改变文件系统。这些命令包括STOR，DELE、RNFR，RNTO，MKO，RMD，APPE和SITE
+local_umask=022               #对于本地用户创建文件的默认权限，注意：如果你想要修改这个值，记住以“0”为前缀，否则这个将会基于10整数对待
+dirmessage_enable=YES         #当设置为YES，ftp用户但第一次进入一个新的目录将会展示消息。在默认情况下。目录扫描.message文件。但是可以通过message_file重写文件的路径。
+xferlog_enable=YES            #当设置为YES，一个日志文件将会详细记录上传下载，在默认情况下，这个将会放置到/var/log/vsftpd.log。但是这个路径是可以被重写的，通过设置属性vsftp_log_file
+connect_from_port_20=YES      #这个控制端口风格的数据连接-在服务器使用20端口（ftp-data），出于安全因素
+xferlog_std_format=YES        #当设置YES，传输日志文件的写的格式是标准的xferlog格式。它可以通过wu-ftpd使用。它非常用，因为它可以再次使用现有的传输分析生成器。默认的格式更易读，然而默认的日志文件位置在/var/log/xferlog,但是你可以通过设置xferlog_file进行改变。
+listen=YES                    #当设置为YES，vsftpd将会采用单独模式运行。这意味着vsftpd不能通过inetd相关软件以前运行，而是，vsftpd直接执行运行。vsftpd将会自己处理监听和处理连接的网络。
+
+
+pam_service_name=vsftpd       #对应PAM服务器名称将会被vsftpd使用
+userlist_enable=YES           #当设置为YES，vsftpd将会加载从userlist_file文件中用户列表。如果一个用户尝试使用这个文件的名字登录，他将会在请求密码的时候被拒绝。这个对于避免明文密码被传输，
+tcp_wrappers=YES              #当设置为YES，vsftpd将会支持tcp_wrappers,所有接入的连接将会通过tcp_wrappers权限控制。更进一步。这是基于每个IP配置。如果tcp_wrappers设置VSFTPD_LOAD_CONF环境变量，那么vsftpd会话将会尝试加载vsftpd配置文件
+
+
+
+
+
+
+
